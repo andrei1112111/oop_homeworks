@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 # **********************************************
 add_executable(test_app
-        hw3/main.cpp
-        hw4/main.cpp
+        hw8/main.cpp
 )
 # **********************************************
