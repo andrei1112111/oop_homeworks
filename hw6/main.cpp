@@ -1,5 +1,12 @@
 #include <iostream>
 #include <stdexcept>
+#include <memory>
+
+
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 
 
 class Time {
@@ -126,35 +133,29 @@ public:
     }
 };
 
-// Инициализация статической переменной
 int Time::count = 0;
 
-// Перегрузка оператора +
 Time operator+(const Time &t, int s) {
     Time newTime(t.GetHours(), t.GetMinutes(), t.GetSeconds() + s);
     newTime.Normalize();
     return newTime;
 }
 
-// Перегрузка оператора -
 Time operator-(const Time &t, int s) {
     Time newTime(t.GetHours(), t.GetMinutes(), t.GetSeconds() - s);
     newTime.Normalize();
     return newTime;
 }
 
-// Перегрузка оператора ==
 bool operator==(const Time &a, const Time &b) {
     return a.GetHours() == b.GetHours() && a.GetMinutes() == b.GetMinutes() && a.GetSeconds() == b.GetSeconds();
 }
 
-// Перегрузка оператора <<
 std::ostream &operator<<(std::ostream &out, const Time &t) {
     out << t.GetHours() << ":" << t.GetMinutes() << ":" << t.GetSeconds();
     return out;
 }
 
-// Перегрузка оператора >>
 std::istream &operator>>(std::istream &in, Time &t) {
     int h, m, s;
     char tmp;
@@ -180,6 +181,30 @@ int main() {
     } catch (const std::exception &e) {
         std::cout << "Caught exception: " << e.what() << std::endl;
     }
+
+    Time* t1 = new Time(12, 30, 45);
+    t1->PrintTime();
+    delete t1;
+
+    Time* tArray = new Time[3];
+    for (int i = 0; i < 3; ++i) {
+        tArray[i].PrintTime();
+    }
+    delete[] tArray;
+
+    std::vector<Time> timeVec;
+    timeVec.push_back(Time(12, 30, 45));
+    timeVec.push_back(Time(14, 45, 55));
+    timeVec.push_back(Time(18, 20, 30));
+    for (const auto& t : timeVec) {
+        t.PrintTime();
+    }
+
+    std::shared_ptr<Time> tShared = std::make_shared<Time>(12, 30, 45);
+    tShared->PrintTime();
+
+    std::unique_ptr<Time> tUnique = make_unique<Time>(12, 30, 45);
+    tUnique->PrintTime();
 
     return 0;
 }

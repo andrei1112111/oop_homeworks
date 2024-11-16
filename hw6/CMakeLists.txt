@@ -3,4 +3,4 @@ project(homework)
 
 set (CMAKE_CXX_STANDARD 11)
 
-add_executable(homework6 main.cpp)
+add_executable(homework7 main.cpp)
