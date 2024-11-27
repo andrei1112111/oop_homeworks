@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
-project(homework2)
+project(homework)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(homework4 main.cpp)
+add_executable(homework8 main.cpp)
