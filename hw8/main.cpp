@@ -32,9 +32,9 @@ public:
 };
 
 
-class TerrestrialCreature : public GenericCreature {
+class TerrestrialCreature : public Amphibious {
 public:
-    explicit TerrestrialCreature(const std::string &name) : GenericCreature(name) {}
+    explicit TerrestrialCreature(const std::string &name) : Amphibious(name) {}
 
     void walk() const {
         std::cout << name << " walking" << std::endl;
@@ -50,9 +50,9 @@ public:
     }
 };
 
-class Waterfowl : public Bird, public OceanCreature {
+class Waterfowl : public Bird {
 public:
-    explicit Waterfowl(const std::string &name) : Bird(name), OceanCreature(name) {}
+    explicit Waterfowl(const std::string &name) : Bird(name) {}
 
     void display() const {
         OceanCreature::display();
