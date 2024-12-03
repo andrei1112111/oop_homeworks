@@ -8,7 +8,6 @@ std::unique_ptr<T> make_unique(Args&&... args) {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-
 class Time {
 private:
     int hours;
@@ -30,10 +29,7 @@ private:
     }
 
 public:
-    Time() noexcept {
-        this->hours = 0;
-        this->minutes = 0;
-        this->seconds = 0;
+    Time() noexcept : hours(0), minutes(0), seconds(0) {
         count++;
         std::cout << "constructor Time(), count: " << count << std::endl;
     }
@@ -54,10 +50,7 @@ public:
         std::cout << "destructor, count: " << count << std::endl;
     }
 
-    Time(const Time &t) noexcept {
-        hours = t.hours;
-        minutes = t.minutes;
-        seconds = t.seconds;
+    Time(const Time &t) noexcept : hours(t.hours), minutes(t.minutes), seconds(t.seconds) {
         count++;
         std::cout << "copy constructor, count: " << count << std::endl;
     }
@@ -88,9 +81,7 @@ public:
     }
 
     int GetHours() const noexcept { return hours; }
-
     int GetMinutes() const noexcept { return minutes; }
-
     int GetSeconds() const noexcept { return seconds; }
 
     int ToSeconds() const noexcept {
@@ -143,8 +134,6 @@ public:
         std::cout << hour12 << ":" << minutes << ":" << seconds << " " << am_pm << std::endl;
     }
 
-    friend class SimpleWatch;
-    friend class Watch;
 };
 
 int Time::count = 0;
@@ -183,7 +172,6 @@ std::istream &operator>>(std::istream &in, Time &t) {
 }
 
 
-// Класс SimpleWatch
 class SimpleWatch {
 public:
     void ShowTime(const Time& t) {
@@ -198,7 +186,7 @@ public:
     }
 };
 
-// Класс Watch
+
 class Watch {
 private:
     bool is24HourFormat;
@@ -215,18 +203,18 @@ public:
         }
     }
 
-    void SetTime(Time& t, int h, int m, int s) const {
-        t.SetHours(h);
-        t.SetMinutes(m);
-        t.SetSeconds(s);
-    }
-
     void SetFormat(bool format24) {
         is24HourFormat = format24;
     }
+
+    friend void SetTime(Watch& watch, Time& t, int h, int m, int s) {
+        t.SetHours(h);
+        t.SetMinutes(m);
+        t.SetSeconds(s);
+    };
 };
 
-// Тестирование
+
 int main() {
     Time t(10, 30, 45);
 
@@ -239,7 +227,7 @@ int main() {
     watch.SetFormat(false);
     watch.ShowTime(t);
 
-    watch.SetTime(t, 15, 45, 30);
+    SetTime(watch, t, 15, 45, 30);
     watch.ShowTime(t);
 
     simpleWatch.SetTime(t, 5, 5, 5);
