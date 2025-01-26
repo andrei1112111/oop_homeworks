@@ -13,7 +13,7 @@ protected:
     std::string name;
 };
 
-class OceanCreature : public GenericCreature {
+class OceanCreature : public GenericCreature {  // ---------------
 public:
     explicit OceanCreature(const std::string &name) : GenericCreature(name) {}
 
@@ -36,9 +36,8 @@ class TerrestrialCreature : public Amphibious {
 public:
     explicit TerrestrialCreature(const std::string &name) : Amphibious(name) {}
 
-    void walk() const {
-        std::cout << name << " walking" << std::endl;
-    }
+private:
+    using OceanCreature::swim;
 };
 
 class Bird : public TerrestrialCreature {
@@ -54,8 +53,8 @@ class Waterfowl : public Bird {
 public:
     explicit Waterfowl(const std::string &name) : Bird(name) {}
 
-    void display() const {
-        OceanCreature::display();
+    void swim() const {
+        Amphibious::swim();
     }
 };
 

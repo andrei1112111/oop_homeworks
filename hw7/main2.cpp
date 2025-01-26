@@ -5,40 +5,6 @@
 class Time;
 class Watch;
 
-class SimpleWatch {
-public:
-    void ShowTime(const Time &t);
-
-    void SetTime(Time &t, int h, int m, int s);
-
-    void SetFormat(Time &t, Watch &w, bool format24);
-};
-
-class Watch {
-private:
-    bool is24HourFormat = true;
-public:
-    Watch() {
-        std::cout << "Watch constructor called." << std::endl;
-    }
-    ~Watch() {
-        std::cout << "Watch deconstructor called." << std::endl;
-    }
-
-    void ShowTime(const Time &t) const;
-
-    void SetTime(Time &t, int h, int m, int s);
-
-    void SetFormat(bool format24);
-
-    friend void SimpleWatch::SetFormat(Time &t, Watch &w, bool format24);
-};
-
-
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args &&... args) {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
 
 class Time {
 private:
@@ -167,13 +133,7 @@ public:
         std::cout << hour12 << ":" << minutes << ":" << seconds << " " << am_pm << std::endl;
     }
 
-    friend class SimpleWatch;
-
-    friend void Watch::ShowTime(const Time &t) const;
-
-    friend void Watch::SetTime(Time &t, int h, int m, int s);
-
-    friend void Watch::SetFormat(bool format24);
+    friend Watch;
 };
 
 int Time::count = 0;
@@ -212,28 +172,34 @@ std::istream &operator>>(std::istream &in, Time &t) {
 }
 
 
-void SimpleWatch::ShowTime(const Time &t) {
-    std::cout << "SimpleWatch Time: ";
-    t.PrintTime24();
-}
+class Watch {
+private:
+    bool is24HourFormat = true;
+    Time *time_;
 
-void SimpleWatch::SetTime(Time &t, int h, int m, int s) {
-    t.SetHours(h);
-    t.SetMinutes(m);
-    t.SetSeconds(s);
-}
+public:
+    explicit Watch(Time *t) : time_(t) {
+        std::cout << "Watch constructor called." << std::endl;
+    }
 
-void SimpleWatch::SetFormat(Time &t, Watch &w, bool format24) {
-    w.SetFormat(format24);
-}
+    ~Watch() {
+        std::cout << "Watch deconstructor called." << std::endl;
+    }
+
+    void ShowTime() const;
+
+    void SetTime(int h, int m, int s);
+
+    void SetFormat(bool format24);
+};
 
 
-void Watch::ShowTime(const Time &t) const {
+void Watch::ShowTime() const {
     std::cout << "Watch Time: ";
     if (is24HourFormat) {
-        t.PrintTime24();
+        time_->PrintTime24();
     } else {
-        t.PrintTime12();
+        time_->PrintTime12();
     }
 }
 
@@ -242,28 +208,80 @@ void Watch::SetFormat(bool format24) {
     is24HourFormat = format24;
 }
 
-void Watch::SetTime(Time &t, int h, int m, int s) {
-    t.SetHours(h);
-    t.SetMinutes(m);
-    t.SetSeconds(s);
+void Watch::SetTime(int h, int m, int s) {
+    time_->SetHours(h);
+    time_->SetMinutes(m);
+    time_->SetSeconds(s);
 }
+
+
+class WallClock : public Watch {
+public:
+    WallClock(Time *t) : Watch(t) {
+        std::cout << "WallClock constructor called." << std::endl;
+    }
+
+    ~WallClock() {
+        std::cout << "WallClock deconstructor called." << std::endl;
+    }
+};
+
+class CuckooClock : public WallClock {
+public:
+    CuckooClock(Time *t) : WallClock(t) {
+        std::cout << "CuckooClock constructor called." << std::endl;
+    }
+
+    ~CuckooClock() {
+        std::cout << "CuckooClock deconstructor called." << std::endl;
+    }
+};
+
+class SmartWatch : public Watch {
+public:
+    SmartWatch(Time *t) : Watch(t) {
+        std::cout << "SmartWatch constructor called." << std::endl;
+    }
+
+    ~SmartWatch() {
+        std::cout << "SmartWatch deconstructor called." << std::endl;
+    }
+};
 
 
 int main() {
     Time t(10, 30, 45);
 
-    SimpleWatch simpleWatch;
-    simpleWatch.ShowTime(t);
+    std::cout << "-----w" << std::endl;
+    Watch Watch1(&t);
 
-    Watch watch;
-    watch.ShowTime(t);
+    Watch1.SetTime(1, 2, 3);
+    Watch1.ShowTime();
 
-    watch.SetFormat(false);
-    watch.ShowTime(t);
+    std::cout << "-----wc" << std::endl;
+    WallClock WallClock1(&t);
 
-    simpleWatch.SetTime(t, 5, 5, 5);
-    simpleWatch.ShowTime(t);
-    simpleWatch.SetFormat(t, watch, true);
+    WallClock1.ShowTime();
+
+
+    Watch1.SetTime(19, 2, 33);
+
+    std::cout << "-----cc" << std::endl;
+    CuckooClock CuckooClock1(&t);
+    CuckooClock1.SetFormat(true);
+    CuckooClock1.ShowTime();
+
+    std::cout << "-----sw" << std::endl;
+    SmartWatch SmartWatch1(&t);
+    SmartWatch1.SetFormat(false);
+    SmartWatch1.ShowTime();
+
+    std::cout << "-----dec" << std::endl;
 
     return 0;
 }
+
+
+// 11.1 | 14(все) | 12.1(+12.2 рассуждения) | 13 | 15
+// ----   -------  -----------------------
+// 0      00          0                         0

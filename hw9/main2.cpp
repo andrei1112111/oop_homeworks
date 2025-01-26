@@ -1,9 +1,11 @@
 #include <iostream>
 #include <string>
 
+
 class GenericCreature {
 public:
-    explicit GenericCreature(const std::string &name) : name(name) {}
+    explicit GenericCreature(const std::string &name) : name(name) {
+    }
 
     void display() const {
         std::cout << "I am " << name << std::endl;
@@ -13,49 +15,48 @@ protected:
     std::string name;
 };
 
-class OceanCreature : public virtual GenericCreature {
+class OceanCreature : virtual public GenericCreature {
 public:
-    explicit OceanCreature(const std::string &name) : GenericCreature(name) {}
+    explicit OceanCreature(const std::string &name) : GenericCreature(name) {
+    }
 
     void swim() const {
         std::cout << name << " swimming" << std::endl;
     }
 };
 
-class Amphibious : public OceanCreature {
+class TerrestrialCreature : virtual public GenericCreature {
 public:
-    explicit Amphibious(const std::string &name)
-            : GenericCreature(name), OceanCreature(name) {}
+    explicit TerrestrialCreature(const std::string &name) : GenericCreature(name) {
+    }
 
     void walk() const {
         std::cout << name << " walking" << std::endl;
     }
 };
 
-class TerrestrialCreature : public virtual GenericCreature {
+class Amphibious : virtual public OceanCreature, virtual public TerrestrialCreature {
 public:
-    explicit TerrestrialCreature(const std::string &name) : GenericCreature(name) {}
-
-    void walk() const {
-        std::cout << name << " walking" << std::endl;
+    explicit Amphibious(const std::string &name) : OceanCreature(name), TerrestrialCreature(name),
+                                                   GenericCreature(name) {
     }
 };
 
-class Bird : public TerrestrialCreature {
+class Bird : virtual public TerrestrialCreature {
 public:
-    explicit Bird(const std::string &name)
-            : GenericCreature(name), TerrestrialCreature(name) {}
+    explicit Bird(const std::string &name) : TerrestrialCreature(name), GenericCreature(name) {
+    }
 
     void fly() const {
         std::cout << name << " flying" << std::endl;
     }
 };
 
-class Waterfowl : public Bird, public OceanCreature {
+class Waterfowl : virtual public Bird, virtual public OceanCreature {
 public:
     explicit Waterfowl(const std::string &name)
-            : GenericCreature(name), Bird(name), OceanCreature(name) {}
-
+        : Bird(name), TerrestrialCreature(name), GenericCreature(name), OceanCreature(name) {
+    }
 };
 
 int main() {

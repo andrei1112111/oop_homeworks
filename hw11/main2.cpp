@@ -3,47 +3,80 @@
 #include <string>
 #include <memory>
 
-
 using namespace std;
-
 
 class GenericCreature {
 public:
-    virtual void eat() = 0;
-    virtual void display() const = 0;
-    virtual ~GenericCreature() = default;
+    explicit GenericCreature(const std::string &name) : name(name) {}
+
+    void display() const {
+        std::cout << "I am " << name << std::endl;
+    }
+
+    virtual void eat() const {
+        std::cout << "I am eating " << name << std::endl;
+    }
 
 protected:
-    string name;
+    std::string name;
 };
 
-class OceanCreature : public virtual GenericCreature {
+class OceanCreature : virtual public GenericCreature {
 public:
-    explicit OceanCreature(const string& name) { this->name = name; }
+    explicit OceanCreature(const std::string &name) : GenericCreature(name) {}
 
-    void eat() override {
-        cout << name << " eating sea food" << endl;
+    void swim() const {
+        std::cout << name << " swimming" << std::endl;
     }
 
-    void display() const override {
-        cout << "Ocean creature " << name << endl;
+    void eat() const override {
+        std::cout << name << " eats fish." << std::endl;
     }
 };
 
-class Amphibious : public OceanCreature {
+class TerrestrialCreature : virtual public GenericCreature {
 public:
-    explicit Amphibious(const string& name) : OceanCreature(name) {}
-
-    void eat() override {
-        cout << name << " eating land and sea food" << endl;
-    }
+    explicit TerrestrialCreature(const std::string &name) : GenericCreature(name) {}
 
     void walk() const {
-        cout << name << " walking on land" << endl;
+        std::cout << name << " walking" << std::endl;
     }
 
-    void display() const override {
-        cout << "Amphibious creature " << name << endl;
+    void eat() const override {
+        std::cout << name << " eats plants." << std::endl;
+    }
+};
+
+class Amphibious : public OceanCreature, public TerrestrialCreature {
+public:
+    explicit Amphibious(const std::string &name)
+        : GenericCreature(name), OceanCreature(name), TerrestrialCreature(name) {}
+
+    void eat() const override {
+        std::cout << name << " eats plants and fish." << std::endl;
+    }
+};
+
+class Bird : virtual public TerrestrialCreature {
+public:
+    explicit Bird(const std::string &name) : TerrestrialCreature(name), GenericCreature(name) {}
+
+    void fly() const {
+        std::cout << name << " flying" << std::endl;
+    }
+
+    void eat() const override {
+        std::cout << name << " eats insects and seeds." << std::endl;
+    }
+};
+
+class Waterfowl : virtual public Bird, virtual public OceanCreature {
+public:
+    explicit Waterfowl(const std::string &name)
+        : Bird(name), TerrestrialCreature(name), GenericCreature(name), OceanCreature(name) {}
+
+    void eat() const override {
+        std::cout << name << " eats small aquatic animals." << std::endl;
     }
 };
 
@@ -51,11 +84,11 @@ class Crocodile : public Amphibious {
 public:
     explicit Crocodile(const string& name) : Amphibious(name) {}
 
-    void eat() override {
+    void eat() const {
         cout << name << " eating legs and hands" << endl;
     }
 
-    void display() const override {
+    void display() const {
         cout << "Crocodile " << name << endl;
     }
 };
@@ -64,46 +97,12 @@ class Alligator : public Amphibious {
 public:
     explicit Alligator(const string& name) : Amphibious(name) {}
 
-    void eat() override {
+    void eat() const {
         cout << name << " eating meat" << endl;
     }
 
-    void display() const override {
+    void display() const {
         cout << "Alligator " << name << endl;
-    }
-};
-
-class TerrestrialCreature : public virtual GenericCreature {
-public:
-    explicit TerrestrialCreature(const string& name) { this->name = name; }
-
-    void eat() override {
-        cout << name << " eating land food" << endl;
-    }
-
-    void walk() const {
-        cout << name << " walking on land" << endl;
-    }
-
-    void display() const override {
-        cout << "Terrestrial creature " << name << endl;
-    }
-};
-
-class Bird : public TerrestrialCreature {
-public:
-    explicit Bird(const string& name) : TerrestrialCreature(name) {}
-
-    void eat() override {
-        cout << name << " eating insects and seeds" << endl;
-    }
-
-    void fly() const {
-        cout << name << " flying" << endl;
-    }
-
-    void display() const override {
-        cout << "Bird " << name << endl;
     }
 };
 
@@ -111,11 +110,11 @@ class Pigeon : public Bird {
 public:
     explicit Pigeon(const string& name) : Bird(name) {}
 
-    void eat() override {
+    void eat() const {
         cout << name << " eating seeds and grains" << endl;
     }
 
-    void display() const override {
+    void display() const {
         cout << "Pigeon " << name << endl;
     }
 };
@@ -124,32 +123,14 @@ class Parrot : public Bird {
 public:
     explicit Parrot(const string& name) : Bird(name) {}
 
-    void eat() override {
+    void eat() const {
         cout << name << " eating fruits and nuts" << endl;
     }
 
-    void display() const override {
+    void display() const {
         cout << "Parrot " << name << endl;
     }
 };
-
-class Waterfowl : public Bird, public OceanCreature {
-public:
-    explicit Waterfowl(const string& name) : Bird(name), OceanCreature(name) {}
-
-    void eat() override {
-        cout << name << " eating fish and plants from land and water" << endl;
-    }
-
-    void display() const override {
-        cout << "Waterfowl " << name << endl;
-    }
-
-    void swim() const {
-        cout << name << " swimming." << endl;
-    }
-};
-
 
 class Creator {
 public:

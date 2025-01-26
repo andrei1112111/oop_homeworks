@@ -192,6 +192,8 @@ int main() {
     }
     delete[] tArray;
 
+    std::cout << std::endl << "!!!" << std::endl;
+
     std::vector<Time> timeVec;
     timeVec.push_back(Time(12, 30, 45));
     timeVec.push_back(Time(14, 45, 55));

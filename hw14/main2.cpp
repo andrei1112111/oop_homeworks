@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 class Time {
 private:
@@ -25,12 +26,41 @@ public:
         std::cout << "constructor Time(" << h << ", " << m << ", " << s << "), count: " << count << std::endl;
     }
 
+    // Move constructor
+    Time(Time&& t) noexcept {
+        hours = t.hours;
+        minutes = t.minutes;
+        seconds = t.seconds;
+
+        t.hours = 0;
+        t.minutes = 0;
+        t.seconds = 0;
+
+        count++;
+        std::cout << "move constructor, count: " << count << std::endl;
+    }
+
+    // Move assignment operator
+    Time& operator=(Time&& t) noexcept {
+        if (this != &t) {
+            hours = t.hours;
+            minutes = t.minutes;
+            seconds = t.seconds;
+
+            t.hours = 0;
+            t.minutes = 0;
+            t.seconds = 0;
+        }
+        std::cout << "move assignment, count: " << count << std::endl;
+        return *this;
+    }
+
     ~Time() {
         count--;
         std::cout << "destructor, count: " << count << std::endl;
     }
 
-    Time(const Time &t) {
+    Time(const Time& t) {
         hours = t.hours;
         minutes = t.minutes;
         seconds = t.seconds;
@@ -79,14 +109,13 @@ public:
         std::cout << "H:" << this->GetHours() << " M:" << this->GetMinutes() << " S:" << this->GetSeconds() << std::endl;
     }
 
-
-Time &operator+=(int s) {
+    Time& operator+=(int s) {
         seconds += s;
         Normalize();
         return *this;
     }
 
-    Time &operator-=(int s) {
+    Time& operator-=(int s) {
         seconds -= s;
         Normalize();
         return *this;
@@ -97,9 +126,7 @@ Time &operator+=(int s) {
     }
 };
 
-
 int Time::count = 0;
-
 
 Time operator+(const Time &t, int s) {
     return Time(t.GetHours(), t.GetMinutes(), t.GetSeconds() + s);
@@ -131,25 +158,44 @@ std::istream &operator>>(std::istream &in, Time &t) {
 }
 
 int main() {
-    {
-        Time t;
-        t.SetHours(1);
-        Time t2 = t;
-        t2.SetHours(2);
-        t2.PrintTime();
-        {
-            t2.SetHours(12);
-            t2.PrintTime();
-            Time t2(22, 22, 22);
-            t2.PrintTime();
-        }
-        t2.PrintTime();
-        Time t3(3, 3, 3);
-        t3 = t;
-        t3.SetHours(3);
-        t3.PrintTime();
+    std::vector<Time> times;
+
+    // rvalue
+    times.push_back(Time(12, 30, 45)); // Move
+    times.push_back(Time(15, 45, 30)); // Move
+
+    // Добавление как lvalue
+    Time t1(9, 15, 30);
+    times.push_back(std::move(t1));  // Copy
+
+    // Move
+    Time t2(8, 20, 10);
+    t2 = Time(5, 5, 5); // Move assignment
+
+    // Просмотр объектов
+    for (const auto& t : times) {
+        std::cout << t << std::endl;
     }
 
+    std::cout << "----------------------------------" << std::endl;
+
+    // 1. Получение rvalue
+    std::cout << "Adding rvalue to vector:" << std::endl;
+    times.push_back(Time(12, 30, 45));
+
+    // 2. Получение lvalue
+    std::cout << "\nAdding lvalue to vector:" << std::endl;
+    Time t11(9, 15, 30);
+    times.push_back(t1);
+
+    // 3. Получение rvalue
+    std::cout << "\nUsing move assignment with rvalue:" << std::endl;
+    Time t22(8, 20, 10);
+    t2 = Time(5, 5, 5);
+
+    // 4. Получение lvalue
+    std::cout << "\nUsing move assignment with lvalue:" << std::endl;
+    Time t33(7, 12, 50);
 
     return 0;
 }
